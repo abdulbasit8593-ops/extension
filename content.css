@@ -1,0 +1,87 @@
+/* SnapQuery – draw overlay styles */
+
+#snapquery-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  cursor: crosshair;
+  /* No background dimming — page stays fully visible */
+}
+
+#snapquery-rect {
+  position: fixed;
+  pointer-events: none;
+  z-index: 2147483646;
+  border: 2px solid #7fff6e;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,0.5),
+    inset 0 0 0 1px rgba(127,255,110,0.2);
+  background: rgba(127,255,110,0.04);
+  display: none;
+}
+
+#snapquery-label {
+  position: fixed;
+  z-index: 2147483647;
+  background: #0d0d0f;
+  border: 1px solid #7fff6e;
+  color: #7fff6e;
+  font-family: 'DM Mono', monospace, monospace;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  pointer-events: none;
+  display: none;
+  white-space: nowrap;
+}
+
+#snapquery-hint {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2147483647;
+  background: rgba(13,13,15,0.9);
+  border: 1px solid #2a2a35;
+  color: #e8e8f0;
+  font-family: 'DM Mono', monospace, monospace;
+  font-size: 12px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  pointer-events: none;
+  backdrop-filter: blur(6px);
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+#snapquery-hint kbd {
+  background: #1e1e24;
+  border: 1px solid #2a2a35;
+  border-radius: 4px;
+  padding: 1px 5px;
+  color: #4ef0d0;
+  font-family: inherit;
+  font-size: 10px;
+}
+
+#snapquery-hint .sq-esc {
+  color: #ff5f5f;
+}
+
+#snapquery-confirm-hint {
+  position: fixed;
+  z-index: 2147483647;
+  background: rgba(13,13,15,0.92);
+  border: 1px solid #7fff6e;
+  color: #7fff6e;
+  font-family: 'DM Mono', monospace, monospace;
+  font-size: 11px;
+  padding: 5px 12px;
+  border-radius: 6px;
+  pointer-events: none;
+  display: none;
+  gap: 8px;
+  align-items: center;
+  white-space: nowrap;
+}

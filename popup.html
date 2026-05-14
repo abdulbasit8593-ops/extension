@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SnapQuery</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      width: 320px;
+      background: #ffffff;
+      color: #111111;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .container { display: flex; flex-direction: column; }
+
+    /* ── Header ── */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px 10px;
+      border-bottom: 0.5px solid #e8e8e8;
+    }
+    .logo { display: flex; align-items: center; gap: 7px; }
+    .logo-icon { font-size: 16px; color: #111; line-height: 1; }
+    .logo-text {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 14px;
+      color: #111;
+      letter-spacing: -0.3px;
+    }
+    .badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      font-weight: 500;
+      color: rgba(0,0,0,0.4);
+      border: 0.5px solid rgba(0,0,0,0.15);
+      border-radius: 4px;
+      padding: 2px 6px;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+
+    /* ── Tabs ── */
+    .tabs {
+      display: flex;
+      border-bottom: 0.5px solid #e8e8e8;
+      background: #fafafa;
+    }
+    .tab {
+      flex: 1;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      padding: 8px 0;
+      font-size: 11px;
+      font-weight: 500;
+      color: rgba(0,0,0,0.4);
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .tab:hover { color: #111; }
+    .tab.active { color: #111; border-bottom-color: #111; }
+
+    /* ── Tab panels ── */
+    .tab-panel { display: none; padding: 14px; }
+    .tab-panel.active { display: flex; flex-direction: column; gap: 12px; }
+
+    /* ── Field label ── */
+    .field-label {
+      display: block;
+      font-size: 10px;
+      font-weight: 600;
+      color: rgba(0,0,0,0.45);
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+
+    /* ── Textarea ── */
+    .prompt-area {
+      width: 100%;
+      background: #f7f7f7;
+      border: 0.5px solid #e0e0e0;
+      border-radius: 6px;
+      color: #111;
+      font-size: 11.5px;
+      font-family: inherit;
+      line-height: 1.5;
+      padding: 8px 10px;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .prompt-area::placeholder { color: rgba(0,0,0,0.3); }
+    .prompt-area:focus { border-color: #aaa; background: #fff; }
+
+    .char-hint { font-size: 10px; color: rgba(0,0,0,0.35); margin-top: 4px; }
+
+    /* ── Text inputs ── */
+    .text-input {
+      width: 100%;
+      background: #f7f7f7;
+      border: 0.5px solid #e0e0e0;
+      border-radius: 6px;
+      color: #111;
+      font-size: 11.5px;
+      font-family: 'DM Mono', monospace;
+      padding: 7px 10px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .text-input::placeholder { color: rgba(0,0,0,0.3); }
+    .text-input:focus { border-color: #aaa; background: #fff; }
+
+    .input-row { display: flex; gap: 6px; align-items: center; }
+    .input-row .text-input { flex: 1; }
+
+    .btn-icon-only {
+      background: #f0f0f0;
+      border: 0.5px solid #e0e0e0;
+      border-radius: 6px;
+      width: 32px; height: 32px;
+      cursor: pointer;
+      font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.12s;
+    }
+    .btn-icon-only:hover { background: #e8e8e8; }
+
+    /* ── Primary / save buttons ── */
+    .btn-primary, .btn-save {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      width: 100%;
+      background: #111;
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      padding: 9px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+      letter-spacing: 0.1px;
+    }
+    .btn-primary:hover, .btn-save:hover { background: #333; }
+    .btn-icon { font-size: 14px; }
+
+    .save-msg { font-size: 11px; color: #2a9d5c; text-align: center; font-weight: 500; }
+
+    /* ── Hint box ── */
+    .hint-box {
+      display: flex;
+      align-items: flex-start;
+      gap: 7px;
+      background: #f7f7f7;
+      border: 0.5px solid #e8e8e8;
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 11px;
+      color: rgba(0,0,0,0.5);
+      line-height: 1.4;
+    }
+    .hint-icon { font-size: 12px; flex-shrink: 0; margin-top: 1px; }
+    kbd {
+      display: inline-block;
+      background: #ececec;
+      border: 0.5px solid #d0d0d0;
+      border-radius: 3px;
+      padding: 0px 4px;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: #333;
+    }
+
+    /* ── Opacity slider row ── */
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .slider-row input[type=range] {
+      flex: 1;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 2px;
+      background: #e0e0e0;
+      border-radius: 1px;
+      outline: none;
+      cursor: pointer;
+    }
+    .slider-row input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #111;
+      cursor: pointer;
+      border: none;
+    }
+    .slider-value {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: rgba(0,0,0,0.5);
+      width: 28px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    /* ── Preview strip ── */
+    .opacity-preview {
+      height: 20px;
+      background: transparent;
+      border: 0.5px solid #e8e8e8;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      overflow: hidden;
+    }
+    .opacity-preview span {
+      font-size: 9px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ── Status area ── */
+    .status-area {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: rgba(0,0,0,0.5);
+    }
+    .status-area.hidden { display: none; }
+    .status-spinner {
+      width: 12px; height: 12px;
+      border: 1.5px solid #ddd;
+      border-top-color: #555;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .section { display: flex; flex-direction: column; }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">
+        <span class="logo-icon">⬡</span>
+        <span class="logo-text">SnapQuery</span>
+      </div>
+      <span class="badge">Gemini</span>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab active" data-tab="capture">Capture</button>
+      <button class="tab" data-tab="settings">Settings</button>
+    </nav>
+
+    <!-- CAPTURE TAB -->
+    <div class="tab-panel active" id="tab-capture">
+      <div class="section">
+        <label class="field-label">Prompt</label>
+        <textarea
+          id="prompt"
+          class="prompt-area"
+          placeholder="Describe what you want Gemini to analyze about the screenshot…"
+          rows="4"
+        ></textarea>
+        <div class="char-hint">Edit freely — this is sent with every capture.</div>
+      </div>
+
+      <div class="section">
+        <label class="field-label">Response text opacity</label>
+        <div class="slider-row">
+          <input type="range" id="opacity-slider" min="5" max="100" value="50" step="1" />
+          <span class="slider-value" id="opacity-value">50%</span>
+        </div>
+        <div class="opacity-preview" id="opacity-preview">
+          <span id="opacity-preview-text" style="color: rgba(0,0,0,0.5)">
+            The response text will look like this at the current opacity.
+          </span>
+        </div>
+      </div>
+
+      <button class="btn-primary" id="btn-draw">
+        <span class="btn-icon">⊹</span>
+        Draw Selection Region
+      </button>
+
+      <div class="hint-box">
+        <span class="hint-icon">⌨</span>
+        After drawing, press <kbd>Alt</kbd>+<kbd>Ctrl</kbd>+<kbd>S</kbd> to capture &amp; send. The region is saved — shortcut reuses it automatically.
+      </div>
+
+      <div id="status-area" class="status-area hidden">
+        <div class="status-spinner" id="spinner"></div>
+        <span id="status-text">Sending to Gemini…</span>
+      </div>
+    </div>
+
+    <!-- SETTINGS TAB -->
+    <div class="tab-panel" id="tab-settings">
+      <div class="section">
+        <label class="field-label" for="api-key">OpenRouter API Key</label>
+        <div class="input-row">
+          <input type="password" id="api-key" class="text-input" placeholder="sk-or-…" />
+          <button class="btn-icon-only" id="btn-toggle-key" title="Show/hide key">👁</button>
+        </div>
+      </div>
+
+      <div class="section">
+        <label class="field-label" for="model">Model</label>
+        <input type="text" id="model" class="text-input" value="google/gemini-2.0-flash-001" placeholder="e.g. google/gemini-2.0-flash-001" />
+        <div class="char-hint">Any vision-capable model on OpenRouter.</div>
+      </div>
+
+      <button class="btn-save" id="btn-save">Save Settings</button>
+      <div id="save-msg" class="save-msg hidden">✓ Saved</div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
